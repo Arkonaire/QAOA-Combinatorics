@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from qaoa_engine import QAOA
 from qiskit import QuantumCircuit
 from qiskit.circuit import Parameter
+from qiskit.circuit.library import RZZGate
 from networkx.drawing.layout import spring_layout
 
 
@@ -24,10 +25,10 @@ class MaxCut(QAOA):
         self.vertices = V
         if isinstance(E, dict):
             self.edges = list(E.keys())
-            self.weights = [E[k] for k in self.edges]
+            self.weights = E
         else:
             self.edges = E
-            self.weights = [1]*len(self.edges)
+            self.weights = {edge: 1 for edge in self.edges}
 
         # Build input graph
         self.graph = nx.Graph()
@@ -53,7 +54,10 @@ class MaxCut(QAOA):
         z: str
 
         # Evaluate dummy C(z)
-        cost = len(z)
+        cost = 0
+        for edge in self.edges:
+            if z[edge[0]] != z[edge[1]]:
+                cost -= self.weights[edge]
         return cost
 
     def build_cost_ckt(self):
@@ -66,7 +70,9 @@ class MaxCut(QAOA):
 
         # Build dummy circuit
         circ = QuantumCircuit(self.n, name='$U(H_C,\\gamma)$')
-        circ.rz(Parameter('param_c'), range(self.n))
+        param = Parameter('param_c')
+        for edge in self.edges:
+            circ.append(RZZGate(param*self.weights[edge]), [edge[0], edge[1]])
         return circ
 
     def visualize_output(self):
@@ -79,10 +85,6 @@ class MaxCut(QAOA):
         z = self.sample(vis=True)
         print('Sampled Output: ' + str(z))
         print('Optimized Cost: ' + str(self.cost_function(z)))
-
-        # Draw variational circuit
-        self.variational_ckt.draw(reverse_bits=True, initial_state=True)\
-            .suptitle('Variational Circuit', fontsize=16)
 
         # Extract colormap
         color_map = []
@@ -117,3 +119,13 @@ class MaxCut(QAOA):
         nx.draw(self.graph, with_labels=True, node_color=color_map, edge_color='green',
                 style=cuts, width=2, ax=ax, pos=pos, font_size=8, font_weight='bold')
         plt.show()
+
+
+if __name__ == '__main__':
+
+    # Test code
+    V = list(range(7))
+    E = [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6)]
+    W = [2, 3, 5, 1, 2, 3]
+    obj = MaxCut(V, {E[i]: W[i] for i in range(len(E))})
+    obj.visualize_output()

@@ -97,7 +97,6 @@ class QAOA:
         # Build default mixer circuit.
         circ = QuantumCircuit(self.n, name='$U(H_B,\\beta)$')
         circ.rx(2*Parameter('param_b'), range(self.n))
-        circ.measure_all()
         return circ
 
     def build_variational_ckt(self):
@@ -157,7 +156,7 @@ class QAOA:
             return self.expectation(beta=params[0:self.p], gamma=params[self.p:2 * self.p])
 
         # Optimize parameters
-        optimizer = COBYLA(maxiter=1000, tol=0.0001)
+        optimizer = COBYLA(maxiter=5000, tol=0.0001)
         params = self.beta_val + self.gamma_val
         ret = optimizer.optimize(num_vars=2 * self.p, objective_function=objfunc, initial_point=params)
         self.beta_val = ret[0][0:self.p]
