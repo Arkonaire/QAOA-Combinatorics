@@ -1,9 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from qiskit import QuantumCircuit, Aer, execute
+from qiskit import QuantumCircuit, execute
 from qiskit.circuit import Parameter, ParameterVector
 from qiskit.visualization import plot_histogram
+from qiskit.providers.aer import QasmSimulator
 from qiskit.aqua.components.optimizers import COBYLA
 
 
@@ -20,13 +21,14 @@ class QAOA:
     Refer docstrings for individual functionalities of these functions.
     """
 
-    def __init__(self, n, p=4):
+    def __init__(self, n, p=4, noise_model=None):
 
         """
         Initialize the QAOA engine and set off the necessary sequence of actions for optimization.
         Args:
             n: No. of qubits in QAOA circuit.
             p: No. of cost-mixer layers in QAOA circuit.
+            noise_model: Qiskit NoiseModel instance. Optional argument for noisy simulations.
         """
 
         # Assign size parameters
@@ -38,7 +40,7 @@ class QAOA:
         self.error = -1
 
         # Set backend options
-        self.simulator = Aer.get_backend('qasm_simulator')
+        self.backend = QasmSimulator(noise_model=noise_model)
 
         # Create variational parameters
         self.gamma = ParameterVector('gamma', length=self.p)
@@ -139,8 +141,7 @@ class QAOA:
 
         # Evaluate expectation value
         circ = self.variational_ckt.bind_parameters({self.beta: beta, self.gamma: gamma})
-        simulator = Aer.get_backend('qasm_simulator')
-        result = execute(circ, simulator, shots=self.num_shots).result()
+        result = execute(circ, self.backend, shots=self.num_shots).result()
         counts = result.get_counts()
         expval = sum([self.cost_function(z) * counts[z] / self.num_shots for z in counts.keys()])
         return expval
@@ -181,13 +182,14 @@ class QAOA:
 
         # Sample maximum cost value
         circ = self.variational_ckt.bind_parameters({self.beta: self.beta_val, self.gamma: self.gamma_val})
-        result = execute(circ, self.simulator, shots=shots).result()
+        result = execute(circ, self.backend, shots=shots).result()
         counts = result.get_counts()
 
         # Display data if asked
         if vis:
             plot_histogram(counts, title='Sample Output', bar_labels=False)
-            plt.subplots_adjust(left=0.15, right=0.85, top=0.9, bottom=0.15)
+            plt.subplots_adjust(left=0.15, right=0.85, top=0.9, bottom=0.25)
 
         # Return optimized selection
-        return max(counts, key=counts.get)
+        avg_cost = sum([self.cost_function(z)*count for z, count in counts.items()]) / self.num_shots
+        return max(counts, key=counts.get), avg_cost
