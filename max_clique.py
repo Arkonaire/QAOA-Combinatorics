@@ -20,7 +20,7 @@ class MaxClique(QAOA):
         Build input graph and begin QAOA
         Args:
             V: Vertices of input graph as a list.
-            E: Edges of input graph as a dictionary with weights or a list if unweighted.
+            E: Edges of input graph as a list.
             noise_model: Qiskit NoiseModel instance. Optional argument for noisy simulations.
         """
 
@@ -100,8 +100,8 @@ class MaxClique(QAOA):
         # Sample output
         z, avg_cost = self.sample(vis=True)
         print('Sampled Output: ' + str(z))
-        print('Optimized Cost: ' + str(self.cost_function(z)))
-        print('Cost Expectation Value: ' + str(avg_cost))
+        print('Minimum Cost: ' + str(self.cost_function(z)))
+        print('Expectation Value: ' + str(avg_cost))
 
         # Extract colormap
         color_map = []

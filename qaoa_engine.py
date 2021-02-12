@@ -36,7 +36,7 @@ class QAOA:
         self.p = p
 
         # Assign control parameters
-        self.num_shots = 1000
+        self.num_shots = 8192
         self.error = -1
 
         # Set backend options

@@ -31,6 +31,7 @@ class MaxCut(QAOA):
         else:
             self.edges = E
             self.weights = {edge: 1 for edge in self.edges}
+        self.weights = {key: value/sum(self.weights.values()) for key, value in self.weights.items()}
 
         # Build input graph
         self.graph = nx.Graph()
@@ -88,8 +89,8 @@ class MaxCut(QAOA):
         # Sample output
         z, avg_cost = self.sample(vis=True)
         print('Sampled Output: ' + str(z))
-        print('Optimized Cost: ' + str(self.cost_function(z)))
-        print('Cost Expectation Value: ' + str(avg_cost))
+        print('Minimum Cost: ' + str(self.cost_function(z)))
+        print('Expectation Value: ' + str(avg_cost))
 
         # Extract colormap
         color_map = []
