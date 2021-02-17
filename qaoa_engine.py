@@ -21,14 +21,14 @@ class QAOA:
     Refer docstrings for individual functionalities of these functions.
     """
 
-    def __init__(self, n, p=4, noise_model=None):
+    def __init__(self, n, p=4, backend=None):
 
         """
         Initialize the QAOA engine and set off the necessary sequence of actions for optimization.
         Args:
             n: No. of qubits in QAOA circuit.
             p: No. of cost-mixer layers in QAOA circuit.
-            noise_model: Qiskit NoiseModel instance. Optional argument for noisy simulations.
+            backend: Custom backend. Can be used for noisy simulations
         """
 
         # Assign size parameters
@@ -40,7 +40,7 @@ class QAOA:
         self.error = -1
 
         # Set backend options
-        self.backend = QasmSimulator(noise_model=noise_model)
+        self.backend = QasmSimulator() if backend is None else backend
 
         # Create variational parameters
         self.gamma = ParameterVector('gamma', length=self.p)
@@ -187,8 +187,10 @@ class QAOA:
 
         # Display data if asked
         if vis:
-            plot_histogram(counts, title='Sample Output', bar_labels=False)
+            fig = plt.figure()
+            ax = fig.add_subplot(1, 1, 1)
             plt.subplots_adjust(left=0.15, right=0.85, top=0.9, bottom=0.25)
+            plot_histogram(counts, title='Sample Output', bar_labels=False, ax=ax)
 
         # Return optimized selection
         avg_cost = sum([self.cost_function(z)*count for z, count in counts.items()]) / self.num_shots

@@ -5,22 +5,20 @@ from qaoa_engine import QAOA
 from networkx.drawing.layout import spring_layout
 from qiskit import QuantumCircuit
 from qiskit.circuit import Parameter
-from qiskit.providers.aer.noise import NoiseModel
-from qiskit.providers.aer.noise import depolarizing_error
 
 
 class MaxCut(QAOA):
 
     """QAOA implementation for Max Cut."""
 
-    def __init__(self, V, E, noise_model=None):
+    def __init__(self, V, E, backend=None):
 
         """
         Build input graph and begin QAOA
         Args:
             V: Vertices of input graph as a list.
             E: Edges of input graph as a dictionary with weights or a list if unweighted.
-            noise_model: Qiskit NoiseModel instance. Optional argument for noisy simulations.
+            backend: Custom backend. Can be used for noisy simulations
         """
 
         # Set up vertices and edges
@@ -39,7 +37,7 @@ class MaxCut(QAOA):
         self.graph.add_edges_from(self.edges)
 
         # Begin QAOA
-        super().__init__(len(V), p=6, noise_model=noise_model)
+        super().__init__(len(V), p=6, backend=backend)
 
     def cost_function(self, z):
 
@@ -130,13 +128,8 @@ class MaxCut(QAOA):
 if __name__ == '__main__':
 
     # Test code
-    p = 0.1
     V = list(range(7))
     E = [(0, 5), (0, 2), (1, 2), (1, 3), (2, 5), (2, 6), (3, 5), (3, 4), (4, 5), (4, 6)]
     W = [2, 3, 5, 1, 2, 3, 6, 2, 5, 3]
-    noise_model = NoiseModel()
-    error = depolarizing_error(p, num_qubits=1)
-    noise_model.add_all_qubit_quantum_error(error, 'noise')
-    noise_model.add_basis_gates(['unitary'])
-    obj = MaxCut(V, {E[i]: W[i] for i in range(len(E))}, noise_model=noise_model)
+    obj = MaxCut(V, {E[i]: W[i] for i in range(len(E))})
     obj.visualize_output()

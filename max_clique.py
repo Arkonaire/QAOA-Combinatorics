@@ -6,22 +6,20 @@ from qaoa_engine import QAOA
 from networkx.drawing.layout import spring_layout
 from qiskit import QuantumCircuit
 from qiskit.circuit import Parameter
-from qiskit.providers.aer.noise import NoiseModel
-from qiskit.providers.aer.noise import depolarizing_error
 
 
 class MaxClique(QAOA):
 
     """QAOA implementation for Max Clique."""
 
-    def __init__(self, V, E, noise_model=None):
+    def __init__(self, V, E, backend=None):
 
         """
         Build input graph and begin QAOA
         Args:
             V: Vertices of input graph as a list.
             E: Edges of input graph as a list.
-            noise_model: Qiskit NoiseModel instance. Optional argument for noisy simulations.
+            backend: Custom backend. Can be used for noisy simulations
         """
 
         # Set up vertices and edges
@@ -35,7 +33,7 @@ class MaxClique(QAOA):
         self.anti_edges = self.acquire_anti_graph()
 
         # Begin QAOA
-        super().__init__(len(V), p=6, noise_model=noise_model)
+        super().__init__(len(V), p=6, backend=backend)
 
     def cost_function(self, z):
 
@@ -141,12 +139,7 @@ class MaxClique(QAOA):
 if __name__ == '__main__':
 
     # Test code
-    p = 0.1
     V = list(range(7))
     E = list(combinations(range(1, 6), 2)) + [(0, 1), (0, 2), (6, 4), (6, 5)]
-    noise_model = NoiseModel()
-    error = depolarizing_error(p, num_qubits=1)
-    noise_model.add_all_qubit_quantum_error(error, 'noise')
-    noise_model.add_basis_gates(['unitary'])
-    obj = MaxClique(V, E, noise_model=noise_model)
+    obj = MaxClique(V, E)
     obj.visualize_output()
