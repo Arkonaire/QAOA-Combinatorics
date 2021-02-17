@@ -10,3 +10,4 @@ Screening Tasks for QOSF mentorship program, Spring 2021.
 * The final report and an overview of the code usage is decribed in the final report, which is the jupyter notebook named __task_4.ipynb__
 * A brief description of the various class methods is given in the report. Descriptions of the arguments and return values may be found in the docstrings within the code.
 * The report is best viewed in nbviewer: https://nbviewer.jupyter.org/github/Arkonaire/QAOA-Combinatorics/blob/master/task_4.ipynb
+* For convenience in evaluation, I have also included a pdf file and an html final with the same contents.
