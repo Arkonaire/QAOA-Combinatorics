@@ -5,6 +5,9 @@ Screening Tasks for QOSF mentorship program, Spring 2021.
 * Library Used: Qiskit
 * Submission Date: 17-Feb-2021
 
+## Requirements
+The code in this repo requires qiskit to run. Installation instructions may be found in https://qiskit.org/documentation/install.html. Be sure to install the visualization tools as well.
+
 ## Overview of the files
 * The major part of the code for this repo is included in the __qaoa_engine.py__, __max_cut.py__ and __max_clique.py__ files.
 * The final report and an overview of the code usage is decribed in the final report, which is the jupyter notebook named __task_4.ipynb__
