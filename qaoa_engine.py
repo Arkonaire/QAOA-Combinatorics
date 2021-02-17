@@ -173,7 +173,7 @@ class QAOA:
             shots: No. of samples to take.
             vis: Boolean value. Displays histogram if set to True.
         Return:
-            Bitstring for output with max measurement counts.
+            Bitstring for output with max measurement counts and the average expectation value.
         """
 
         # Resolve defaults
